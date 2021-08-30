@@ -1,0 +1,19 @@
+Q1:
+	mean:		 1.718333 
+	sd:			 0.1149572 
+	len:		 12 
+	num < 1.65:	 4 
+	is 1.6 < val < 1.75:
+				1.55 	FALSE
+				1.92 	FALSE
+				1.6 	FALSE
+				1.75 	FALSE
+				1.58 	FALSE
+				1.67 	TRUE
+				1.63 	TRUE
+				1.82 	FALSE
+				1.76 	FALSE
+				1.77 	FALSE
+				1.72 	TRUE
+				1.85 	FALSE
+				
