@@ -1,5 +1,8 @@
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse, ISwR)
+
+# output will be saved where this file is located
+
 library(tidyverse)
 this_dir <-  function() {
     this_dir <- commandArgs() %>%
@@ -12,7 +15,7 @@ this_dir <-  function() {
       this_dir <- rstudioapi::getSourceEditorContext()$path
     return(dirname(this_dir))
 }
-setwd(this_dir()) # output will be saved where this file is located
+setwd(this_dir())
 output <- "1.txt" # name of output file
 
 # Q1
@@ -42,3 +45,8 @@ write.table(subset(thuesen, blood.glucose > 10 & short.velocity > 1.5),
             col.names = c("glucose", "velocity"), file = output, append = TRUE,
             sep = "  \t", eol = "\n\t\t ")
 cat("\n", file = output, append = TRUE)
+
+# Q4
+
+cat("Q4:\t1)\t", as.integer(runif(15, 0, 81)),
+    "\n\n", file = output, append = TRUE)
