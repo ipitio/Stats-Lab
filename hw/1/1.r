@@ -1,5 +1,5 @@
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(tidyverse)
+pacman::p_load(tidyverse, ISwR)
 library(tidyverse)
 this_dir <-  function() {
     this_dir <- commandArgs() %>%
@@ -14,8 +14,6 @@ this_dir <-  function() {
 }
 setwd(this_dir()) # output will be saved where this file is located
 output <- "1.txt" # name of output file
-
-# For best results, set tab to 4 spaces #
 
 # Q1
 
@@ -35,3 +33,12 @@ tmp <- matrix(rnorm(12), 3, 4)
 cat("Q2:\t1)\t", sum(rowSums(tmp)[-1]), "\n\t2)\t",
     prod(colSums(tmp)[c(2, 4)]), "\n\t3)\t", dim(tmp), "\n\t4)\t",
     c((less <- tmp[2, ])[less < 0.2]), "\n\n", file = output, append = TRUE)
+
+# Q3
+
+library(ISwR)
+cat("Q3:\t1)\t\t", file = output, append = TRUE)
+write.table(subset(thuesen, blood.glucose > 10 & short.velocity > 1.5),
+            col.names = c("glucose", "velocity"), file = output, append = TRUE,
+            sep = "  \t", eol = "\n\t\t ")
+cat("\n", file = output, append = TRUE)
