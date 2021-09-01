@@ -60,7 +60,7 @@ cat("Q4:\t1)\t", randomNumbers(15, 0, 81),
 ###
 
 max <- 2^10
-rand <- randomNumbers(1, 1, max, 1)
+rand <- randomNumbers(1, 3, max, 1)
 cat("Q5:\t1)\t", sample(sample(rand, 3), rand, TRUE, c(0.2, 0.3, 0.5)),
     "\n\t2)\t", rmultinom(as.integer(rand / 3), rand, c(0.2, 0.3, 0.5)),
     file = output, append = TRUE)
