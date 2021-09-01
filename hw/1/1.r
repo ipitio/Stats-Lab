@@ -1,7 +1,6 @@
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(tidyverse, ISwR)
-
-# output will be saved where this file is located
+pacman::p_load(tidyverse, ISwR, random)
+options(warn = -1)
 
 library(tidyverse)
 this_dir <-  function() {
@@ -15,7 +14,7 @@ this_dir <-  function() {
       this_dir <- rstudioapi::getSourceEditorContext()$path
     return(dirname(this_dir))
 }
-setwd(this_dir())
+setwd(this_dir()) # output will be saved where this file is located
 output <- "1.txt" # name of output file
 
 # Q1
@@ -48,5 +47,22 @@ cat("\n", file = output, append = TRUE)
 
 # Q4
 
-cat("Q4:\t1)\t", as.integer(runif(15, 0, 81)),
+library(random)
+cat("Q4:\t1)\t", randomNumbers(15, 0, 81),
     "\n\n", file = output, append = TRUE)
+
+# Q5
+
+###
+# Max vector length is 2^52:
+# http://www.rdocumentation.org/packages/base/versions/3.6.2/topics/LongVectors
+# Computer may not be able to handle; max = 2^10 good enough?
+###
+
+max <- 2^10
+rand <- randomNumbers(1, 1, max, 1)
+cat("Q5:\t1)\t", sample(sample(rand, 3), rand, TRUE, c(0.2, 0.3, 0.5)),
+    "\n\t2)\t", rmultinom(as.integer(rand / 3), rand, c(0.2, 0.3, 0.5)),
+    file = output, append = TRUE)
+
+writeLines(readLines(output)) # output printed to console for convenience
