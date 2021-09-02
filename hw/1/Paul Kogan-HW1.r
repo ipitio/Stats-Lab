@@ -1,7 +1,6 @@
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse, ISwR, random)
 options(warn = -1)
-
 library(tidyverse)
 this_dir <-  function() {
     this_dir <- commandArgs() %>%
@@ -15,7 +14,7 @@ this_dir <-  function() {
     return(dirname(this_dir))
 }
 setwd(this_dir()) # output will be saved where this file is located
-output <- "1.txt" # name of output file
+output <- "Paul Kogan-HW1.txt" # name of output file
 
 # Q1
 
@@ -60,9 +59,10 @@ cat("Q4:\t1)\t", randomNumbers(15, 0, 81),
 ###
 
 max <- 2^10
-rand <- randomNumbers(1, 3, max, 1)
-cat("Q5:\t1)\t", sample(sample(rand, 3), rand, TRUE, c(0.2, 0.3, 0.5)),
-    "\n\t2)\t", rmultinom(as.integer(rand / 3), rand, c(0.2, 0.3, 0.5)),
-    file = output, append = TRUE)
+rnd <- randomNumbers(1, 3, max, 1)
+prb <- c(0.2, 0.3, 0.5)
+len <- length(prb)
+cat("Q5:\t1)\t", sample(sample(rnd, len), rnd, TRUE, prb), "\n\t2)\t",
+    rmultinom(as.integer(rnd / len), rnd, prb), file = output, append = TRUE)
 
 writeLines(readLines(output)) # output printed to console for convenience
