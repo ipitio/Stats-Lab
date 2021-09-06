@@ -52,17 +52,12 @@ cat("Q4:\t1)\t", randomNumbers(15, 0, 81),
 
 # Q5
 
-###
-# Max vector length is 2^52:
-# http://www.rdocumentation.org/packages/base/versions/3.6.2/topics/LongVectors
-# Computer may not be able to handle; max = 2^10 good enough?
-###
-
-max <- 2^10
-rnd <- randomNumbers(1, 3, max, 1)
+rnd <- randomNumbers(1, 1, 10^6, 1)
 prb <- c(0.2, 0.3, 0.5)
 len <- length(prb)
-cat("Q5:\t1)\t", sample(sample(rnd, len), rnd, TRUE, prb), "\n\t2)\t",
-    rmultinom(as.integer(rnd / len), rnd, prb), file = output, append = TRUE)
+size <- as.integer(rnd / len)
+cat("Q5:\t1)\t", sample(sample(rnd, len, ifelse(rnd == 1, TRUE, FALSE)), size,
+    TRUE, prb), "\n\t2)\t", rmultinom(ifelse(rnd != 1, size, 1), rnd, prb),
+    file = output, append = TRUE)
 
 writeLines(readLines(output)) # output printed to console for convenience
