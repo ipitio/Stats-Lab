@@ -52,12 +52,11 @@ cat("Q4:\t1)\t", randomNumbers(15, 0, 81),
 
 # Q5
 
-rnd <- randomNumbers(1, 1, 10^6, 1)
 prb <- c(0.2, 0.3, 0.5)
 len <- length(prb)
-size <- as.integer(rnd / len)
-cat("Q5:\t1)\t", sample(sample(rnd, len, ifelse(rnd == 1, TRUE, FALSE)), size,
-    TRUE, prb), "\n\t2)\t", rmultinom(ifelse(rnd != 1, size, 1), rnd, prb),
-    file = output, append = TRUE)
+rnd <- randomNumbers(1, len, 10^6, 1)
+amt <- as.integer(rnd / len)
+cat("Q5:\t1)\t", sample(sample(rnd, len), amt, TRUE, prb), "\n\t2)\t",
+    rmultinom(amt, rnd, prb), file = output, append = TRUE)
 
 writeLines(readLines(output)) # output printed to console for convenience
