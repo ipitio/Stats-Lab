@@ -40,7 +40,7 @@ boxplot(x, log(abs(x)), main = "x vs log(abs(x))",
 
 **5** *a*
 ```{r}
-hist(ISwR::react)
+hist(ISwR::react, breaks = 18)
 ```
 **5** *b*
 ```{r}

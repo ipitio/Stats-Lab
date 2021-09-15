@@ -17,8 +17,8 @@ rmarkdown::render(paste("Paul Kogan-HW", 2, ".rmd", sep = ""))
 
 # jpeg("plot.jpeg")
 # plot
-#invisible(dev.off())
+# invisible(dev.off())
 # ![]("plot.jpeg")
 
-#tinytex::install_tinytex()
-#tinytex::tlmgr_update()
+# tinytex::install_tinytex()
+# tinytex::tlmgr_update()
