@@ -1,0 +1,269 @@
+---
+title: "AMS394_note3"
+author: "Weihao Wang"
+date: "5/3/2021"
+output: html_document
+---
+
+**1. One Sample Tests**
+
+1.1 One sample t-test
+
+The t tests are based on an assumption that data come from the normal distribution. In the one- sample case we assume that data x1, . . . , xn are normal random variables with mean u and variance sigma. We wish to test the null hypothesis that H0:mu=mu0.
+
+Consider an example concerning daily energy intake in kJ for 11 women (Altman, 1991, p. 183). First, the values are placed in a data vector:
+```{r}
+daily.intake <- c(5260,5470,5640,6180,6390,6515,6805,7515,7515, 8230,8770)
+mean(daily.intake)
+sd(daily.intake)
+quantile(daily.intake)
+t.test(daily.intake, mu = 7725)
+# t.test()
+res<-t.test(daily.intake,mu=7725)
+names(res)
+res
+res$para
+res$conf.int
+res$statistic
+res$p.value
+res$method
+```
+
+Example 1:
+The seven scores listed below are axial loads (in pounds) for a random sample of 7 12-oz aluminum cans manufactured by ALUMCO. An axial load of a can is the maximum weight supported by its sides, and it must be greater than 165 pounds, because that is the maximum pressure applied when the top lid is pressed into place.
+
+270, 273, 258, 204, 254, 228, 282
+
+(1) As the quality control manager, please test the claim of the engineering supervisor that the average axial load is greater than 165 pounds. Use α = 0.05 . What assumptions are needed for your test?
+```{r}
+# Ha: mu > 165 ----> one-sided t-test
+data_cans<-c(270,273,258,204,254,228,282) #input the data
+# method1:
+t.test(data_cans, mu = 165, alternative = "greater")
+# compare the p-value with alpha
+# method2:
+data_cans<-data_cans-165
+data_cans
+# by minusing 165, we just need to estimate if the new data greater than 0 significantly
+t.test(data_cans,alternative = "greater")
+# Since we assume the samples comes from normal population, we will not test their normality and use t.test directly
+```
+
+Example 2:
+
+Over then past 5 years, the mean time for a warehouse to fill a buyer’s order has been 25 minutes. Officials of the company believe that the length of time has increased recently, either due to a change in the workforce or due to a change in customer purchasing policies. The processing time (in minutes) was recorded for a random sample of 15 orders processed over the past month.
+
+28 25 27 31 10 26 30 15 55 12 24 32 28 42 38
+
+Questions:
+(a). Please check the normality of the data.
+(b). Please test the research hypothesis at the significance level α = 0.05.
+```{r}
+# a)
+Exercise<-c(28,25,27,31,10,26,30,15,55,12,24,32,28,42,38)
+shapiro.test(Exercise) #H0: the data is normally distributed
+#p-value = 0.4038, can NOT reject Ho (data are normal), so based on the data we claim the data do appear to follow the normal distribution
+
+# b)
+t.test(Exercise, mu=25, alternative="greater")
+#alternative = "less"/"greater"/"two.sided"
+
+#p-value = 0.1485, can NOT reject Ho (the mean time for a warehouse to fill a buyer’s order has been 25 minutes or less), so based on the data we have, we can NOT claim the length of time has increased
+```
+
+1.2 Wilcoxon signed-rank test
+
+The t tests are fairly robust against departures from the normal distribution especially in larger samples, but sometimes you wish to avoid making that assumption. To this end, the distribution- free methods are convenient.
+
+For the one-sample Wilcoxon test, the procedure is to subtract the theoretical u0 and rank the differences according to their numerical value, ignoring the sign, and then calculate the sum of the positive or negative ranks. The point is that, assuming only that the distribution is symmetric around u0, the test statistic corresponds to selecting each number from 1 to n with probability 1/2 and calculating the sum. The distribution of the test statistic can be calculated exactly, at least in principle. It becomes computationally excessive in large samples, but the distribution is then very well approximated by a normal distribution.
+
+```{r}
+res2 <- wilcox.test(daily.intake, mu=7725)
+res2
+```
+
+**2. Two Sample Tests**
+
+2.1 Inference on two population means: Paired samples
+
+```{r}
+library(ISwR)
+data(intake)
+attach(intake)
+intake
+t.test(pre,post,paired=T) # paired = T or TRUE
+#t.test(pre,post) is wrong
+wilcox.test(pre,post,paired=T)
+
+different = post-pre
+t.test(different)
+```
+
+Example. Paired Samples T-test and the Wilcoxon Signed Rank Test. 
+
+To study the effectiveness of wall insulation in saving energy for home heating, the energy consumption (in MWh) for 5 houses in Bristol, England, was recorded for two winters; the first winter was before insulation and the second winter was after insulation:
+
+House  1    2    3    4    5
+Before 12.1 10.6 13.4 13.8 15.5
+After  12.0 11.0 14.1 11.2 15.3
+
+(a) Please provide a 95% confidence interval for the difference between the mean energy consumption before and after the wall insulation is installed. What assumptions are necessary for your inference?
+
+(b) Can you conclude that there is a difference in mean energy consumption before and after the wall insulation is installed at the significance level 0.05? Please test it and evaluate the p-value of your test. What assumptions are necessary for your inference?
+
+(c) Please write the R code to perform the test and examine the necessary assumptions given in (b).
+```{r}
+Before=c(12.1,10.6,13.4,13.8,15.5) 
+After=c(12.0,11.0,14.1,11.2,15.3)
+#create the paired differences, Diff
+Diff=Before-After
+shapiro.test(Diff)
+#We can barely conclude Diff follows normal distribution since p=0.08496 is small but still > 0.05, while < 0.10
+
+#One-sample t- test for Diff
+t.test(Diff)
+#p-value = 0.5707; 95% CI is [-1.26036,1.98036]
+
+#Alternatively, we can perform the paired-samples t- test directly use the original Before and After data as follows
+t.test(Before, After, paired=TRUE)
+# p-value = 0.5707
+```
+
+Review: Paired Samples T-test
+        t.test(a, b, paired=TRUE)
+```{r}
+#Wilcoxon Signed-Rank Test, based on the original data
+wilcox.test(Before, After, paired = TRUE)
+#Wilcoxon Signed-Rank Test, based on the original data, alternative form
+wilcox.test(Before-After)
+#Wilcoxon Signed-Rank Test, based on the paired differences
+wilcox.test(Diff)
+```
+
+Review: Wilcoxon One-Sample Test (Wilcoxon Signed Rank Test)
+        wilcox.test(x, y, paired = TRUE, alternative = "greater") 
+        wilcox.test(y - x, alternative = "less")
+        ?wilcox.test
+
+2.2 Inference on two population means: Independent samples
+
+Example. Independent Samples T-Test. 
+An experiment was conducted to compare the mean number of tapeworms in the stomachs of sheep that had been treated for worms against the mean number in those that were untreated. A sample of 14 worm- infected lambs was randomly divided into 2 groups. Seven were injected with the drug and the remainders were left untreated. After a 6-month period, the lambs were slaughtered and the following worm counts were recorded:
+
+Drug-treated sheep 18 43 28 50 16 32 13 
+Untreated sheep    40 54 26 63 21 37 39
+
+(a). Test at α = 0.05 whether the treatment is effective or not.
+(b). What assumptions do you need for the inference in part (a)? 
+(c). Please write up the entire R program necessary to answer questions raised in (a) and (b).
+```{r}
+sheep1<-Drug.treated.sheep <-c(18,43,28,50,16,32,13) 
+sheep2<-Untreated.sheep <-c(40,54,26,63,21,37,39) #Normality test for each population
+shapiro.test(sheep1) # * check the normality one by one
+shapiro.test(sheep2)
+#F-test for equal variances
+var.test(sheep1,sheep2) # var.test: check equal variance
+# p-value > 0.05 ---> equal var
+#F-test shows the ratio of two variances should equal to 1#
+t.test(sheep1,sheep2,var.equal=TRUE,a="l") #alternative = "less"
+#var.equal=TRUE:two variances are equal, p=0.08152
+
+# if it is not normal
+wilcox.test(sheep1,sheep2,conf.int=TRUE ,a="l")
+#Both the t.test and Wilcoxon rank sum test show that we have insufficient evidence to reject the hypothesis that there is no difference in the mean number of worms in treated and untreated lambs
+```
+1. input the datasets
+paired or not
+2. check the normality one by one
+---> normal
+3. check equal var assumption
+---> t.test(var.equal = )
+
+---> not normal
+3. wilcoxon
+
+
+
+Example. Wilcoxon Rank Sum Test
+A new drug for reducing blood pressure (BP) is compared to an old drug. 20 patients with comparable high BP were recruited and randomized evenly to the 2 drugs. Reductions in BP after 1 month of taking the drugs are as follows:
+
+New drug: 0, 10, -3, 15, 2, 27, 19, 21, 18, 10
+Old drug: 8, -4, 7, 5, 10, 11, 9, 12, 7, 8
+
+Please test at α = 0.05 whether the new drug is better than the old one.
+```{r}
+Nd<-New.drug<-c(0,10,-3,15,2,27,19,21,18,10)
+Od<-Old.drug<-c(8,-4,7,5,10,11,9,12,7,8)
+shapiro.test(Nd)
+shapiro.test(Od) 
+#Hence we conclude that the population distribution of old drugs (Od) is not a normal distribution
+wilcox.test(Nd,Od)
+wilcox.test(Nd,Od,alternative="g")
+#p=0.1849/2>0.05, so we cannot conclude that the new drug is better than the old one using the nonparametric Wilcoxon Rank Sum test
+```
+
+Note: As you can see from this example, the normality test is very important – indeed we should not have used the unspooled variance t-test because the normality assumption is not satisfied in this problem.
+
+Review:
+Wilcoxon Two-Sample Test (Wilcoxon Rank Sum Test), also referred to as the Mann-Whitney U Test
+# Wilcoxon Rank Sum Test
+wilcox.test(y~A)
+# where y is numeric and A is A binary factor
+
+# Wilcoxon Rank Sum Test 
+wilcox.test(y,x)
+# where y and x are numeric
+
+How to comment in R
+A hash (#) anywhere on a line will comment out the rest of the line.
+
+Exercise 1.
+An agricultural experiment station was interested in comparing the yields for two new varieties of corn. Because the investigators thought that there might be a great deal of variability in yield from one field to another, each variety was randomly assigned to a different 1-acre plot on each of seven farms. The 1- acre plots were planted; the corn was harvested at maturity. The results of the experiment (in bushels of corn) are listed here. Use these data to test the null hypothesis that there is no difference in mean yields for the two varieties of corn. Use α = .05.
+```{r}
+(df<-data.frame(Farm=c(1,2,3,4,5,6,7),VarietyA=c(48.2,44.6,49.7,40.5,54.6,47.1,51.4),VarietyB=c(41.5,40.1,44.0,41.2,49.8,41.7,46.8)))
+
+t(df)
+#transpose the data frame#
+diff=df[,2]-df[,3];diff
+#Get the data ready for tests#
+shapiro.test(diff)
+#p=0.01498<0.05, which means diff does not follow normal distribution#
+#Hence, we cannot use t-test#
+wilcox.test(diff)
+#p=0.03125, which suggests wo should reject null hypothesis# #and think there is differences in mean yields for the two varieties of corn#
+stem(diff,scale=2)
+boxplot(diff)
+qqnorm(diff)
+qqline(diff)
+#ususally we use qqnorm and qqline together#
+#Also by q-qplot, we cannot think diff follows normal distribution#
+```
+
+Exercise 2.
+A pollution-control inspector suspected that a riverside community was releasing semi-treated sewage into a river and this, as a consequence, was changing the level of dissolved oxygen of the river. To check this, he drew 5 randomly selected specimens of river water at a location above the town and another 5 specimens below. The dissolved oxygen readings, in parts per million, are given in the accompanying table. Do the data provide sufficient evidence to indicate a difference in mean oxygen content between locations above and below the town? Use α = .05.
+```{r}
+data.frame(Above_town=c(4.8,5.2,5.0,4.9,5.1) ,Below_town=c(5.0,4.7,4.9,4.8,4.9))
+
+At<-c(4.8,5.2,5.0,4.9,5.1) 
+Bt<-c(5.0,4.7,4.9,4.8,4.9)
+shapiro.test(At)
+shapiro.test(Bt)
+stem(At,scale=2)
+boxplot(At)
+qqnorm(At)
+qqline(At)
+stem(Bt,scale=2)
+boxplot(Bt)
+qqnorm(Bt)
+qqline(Bt)
+#The results from shapiro.test and output images show At and Bt follow normal distribution
+#Hence, we can use t.test
+var.test(At,Bt) #F-test
+#p=0.5421, so the variances of At and Bt are equal
+t.test(At,Bt,var.equal=TRUE)
+#p=0.147>0.05
+#Hence, we should accept null hypothesis that there is no differences between At and Bt
+```
+
+
+

@@ -1,0 +1,234 @@
+---
+title: "AMS394_note4"
+author: "Weihao Wang"
+date: "5/4/2021"
+output: html_document
+---
+
+**1. Regression and correlation**
+
+1.1 Simple linear regression
+
+The linear regression model is given by
+𝑦 = 𝛼 + 𝛽𝑥 + 𝜀
+in which the 𝜀" are assumed independent and 𝑁(0, 𝜎^2), The parameters 𝛼, 𝛽, and 𝜎. can be estimated using the method of least squares. In particular, the values of 𝛼 and 𝛽 can be obtained by minimizing the sum of squared residuals, and 𝜎. can be estimated via the sum of squared residuals.
+
+```{r}
+library(ISwR) 
+data(thuesen) 
+attach(thuesen) # blood -- x velocity -- y
+lm(short.velocity~blood.glucose) # fit linear regression: lm(y~x)
+# short.velocity = 1.09781 + 0.02196 * blood.glucose
+summary(lm(short.velocity~blood.glucose))
+plot(blood.glucose,short.velocity) 
+abline(lm(short.velocity~blood.glucose))
+```
+
+1.2 Residuals and fitted values
+
+We have seen how summary can be used to extract information about the results of a regression analysis. Two further extraction functions are fitted and resid.
+```{r}
+lm.velo<-lm(short.velocity~blood.glucose) 
+fitted(lm.velo)
+resid(lm.velo) 
+plot(blood.glucose,short.velocity) 
+abline(lm.velo)
+
+#plot(blood.glucose,short.velocity) 
+#lines(blood.glucose,fitted(lm.velo)) # Becasue of NAs
+
+plot(blood.glucose,short.velocity)
+lines(blood.glucose[!is.na(short.velocity)],fitted(lm.velo))
+# blood.glucose[!is.na(short.velocity) & !is.na(blood.glucose)] #lines(blood.glucose[!is.na(short.velocity) & !is.na(blood.glucose)],fitted(lm.velo))
+
+options(na.action=na.exclude) 
+lm.velo<-lm(short.velocity~blood.glucose) 
+fitted(lm.velo)
+plot(blood.glucose,short.velocity)
+abline(lm.velo) 
+segments(blood.glucose,fitted(lm.velo),blood.glucose,short.velocity)
+plot(fitted(lm.velo),resid(lm.velo)) 
+qqnorm(resid(lm.velo))
+```
+
+Exercise
+```{r}
+logret<- read.table("d_logret_6stocks.txt", header=T)
+names(logret)
+attach(logret)
+
+(fit1 <- lm(Pfizer~Intel))
+summary(fit1)
+names(fit1)
+fit1$coefficients
+plot(Intel, Pfizer)
+abline(lm(Pfizer~Intel))
+
+fit2 <- lm(Pfizer~-1+Intel) # regression without intercept
+summary(fit2)
+
+fitted(fit1)
+resid(fit1)
+plot(Intel, Pfizer)
+lines(Intel, fitted(fit1))
+```
+
+1.3 Correlation
+
+The function 'cor' can be used to compute the correlation between two or more vectors.
+```{r}
+attach(thuesen)
+cor(blood.glucose,short.velocity) 
+cor(blood.glucose,short.velocity,use="complete.obs") 
+# use: an optional character string giving a method for computing covariances in the presence of missing values. 
+cor(thuesen,use="complete.obs") 
+cor.test(blood.glucose,short.velocity)
+```
+
+Exercise
+```{r}
+cor(Intel, Pfizer)
+cor.test(Intel, Pfizer)
+```
+
+**2. Muliple linear regression & General linear model**
+
+Multiple linear regression is used to model the relationship between one numeric outcome or response or dependent variable (Y), and several (multiple) explanatory or independent or predictor or regressor variables (X). When some predictors are categorical variables, we call the subsequent regression model as the General Linear Model.
+
+2.1 Import Data
+
+```{r}
+# Directly from the internet
+data <-read.table('http://www.randomservices.org/random/data/Galton.txt', header = T)
+# From your own directories
+# You need to set your directory at the beginning
+data <- read.table("Galton.txt", header = TRUE)
+# Or use the whole directory
+data <- read.table("/Users/ian/Desktop/SBU/AMS 394/summer 2021/Galton.txt", header = TRUE)
+
+#Recall:
+#Y = height of child 
+#x1 = height of father
+#x2 = height of mother 
+#x3 = gender of children
+y<-data$Height 
+x1<-data$Father
+x2<-data$Mother 
+x3<-rep(0, dim(data)[1])
+x3[data$Gender == "M"]<-1
+```
+
+2.2 Multiple regression using the lm() function
+
+```{r}
+#To perform Multiple Regression,
+#we use the same functions as we use in Simple Linear Regression 
+#Notice that we use "+" between two variables in lm()
+mod<-lm(y ~ x1+x2+x3)
+summary(mod)
+#Notice that 4 p-values are very small,
+#which means variables x1,x2,x3
+#have strong linear relationship with y.
+#We conclude that all β are significantly different from zero.
+#Since F = 529>2.615, we reject Ho,
+#and conclude that our model predicts height better than by chance.
+#Equivalently, F-statistic's p-value: < 2.2e-16, hence we reject Ho.
+```
+
+2.3 Obtain confidence intervals for model parameters
+
+```{r}
+#The following function is used to get CI of your "Beta"
+confint(mod,level=0.95) 
+#confint(mod,conf.level=0.95)
+```
+
+2.4 Check model goodness-of-fit
+
+```{r}
+par(mfrow=c(2,2)) 
+plot(mod)
+# 1 -- independence
+# 2 -- normality
+```
+
+2.5 General Linear Model using the function
+
+We can use glm() as well – this is especially convenient when we have **categorical variables** in our data set. Instead of creating dummy variables by ourselves, R can directly work with the categorical var iables. This is in the same spirit as the Proc GLM procedure in SAS.
+
+glm {stats}
+Fitting Generalized Linear Models
+Description:
+glm is used to fit generalized linear models, specified by giving a symbolic description of the linear predictor and a description of the error distribution.
+
+Usage:
+glm(formula, family = gaussian, data, weights, subset,
+ na.action, start = NULL, etastart, mustart, offset,
+ control = list(...), model = TRUE, method = "glm.fit",
+ x = FALSE, y = TRUE, contrasts = NULL, ...)
+ You can see the details by help(glm)
+```{r}
+x3<- data$Gender
+mod1<-glm(y~x1+x2+factor(x3))
+summary(mod1)
+#The result is similar to summary(mod)
+#As we see, R uses “F” as x3's reference level because “F” comes bef ore “M” in the alphabetic order.
+
+#Now we change it into “M”
+x3<-relevel(factor(x3),ref="M")
+mod1<-glm(y~x1+x2+factor(x3)) 
+summary(mod1)
+```
+
+2.6 Import data in other formats
+
+Instead of read.table(), we can use read.csv() to read .csv files, or read.xlsx to read .xlsx files. (we need to install and library the package ‘xlsx’ to read excel files)
+```{r}
+#install.packages("xlsx")
+library(xlsx)
+data1<-read.xlsx("heat.xlsx", 1)
+data1
+```
+
+2.7 Best subset variable selection
+
+```{r}
+# Now we need to first install the library ‘leaps’, and then we call it:
+# install.packages("leaps")
+library(leaps)
+attach(data1)
+#The attach command above will enable R to use the variables in the dataset directly.
+leaps1<-regsubsets(Y~X1+X2+X3+X4,data=data1)
+summary(leaps1)
+leaps1<-regsubsets(Y~X1+X2+X3+X4,data=data1, nbest = 10)
+summary(leaps1)
+
+plot(leaps1, scale="r2")
+plot(leaps1, scale="adjr2") 
+plot(leaps1, scale="bic") 
+plot(leaps1, scale="Cp")
+```
+
+2.8 Stepwise variable selection
+
+```{r}
+#Next, We use step() to perform Stepwise Regression
+#step selects the model by AIC
+#step is a slightly simplified version of stepAIC in package MASS
+library(MASS)
+step(lm(Y~X1+X2+X3+X4), data=data1)
+summary(step(lm(Y~X1+X2+X3+X4), data=data1))
+# The final model is: Y = β0 +β1X1 +β3X3 + ε
+```
+
+2.9 Different variable selction criteria
+
+
+Please also note that SAS and R may give you different results in variable selection because different selection criteria maybe used. For example, in SAS, for stepwise variable selection, we use the F-test/Partial correlation. However, in R, we use the AIC criterion. For those of you who are highly interested in this topic, you can study on your own, for example, the following papers:
+
+https://stat.ethz.ch/R-manual/R-devel/library/stats/html/step.html
+http://analytics.ncsu.edu/sesug/2007/SA05.pdf
+
+The AIC (Akaike information criterion) was proposed by Dr. Hirotugu Akaike.
+Let L be the maximum value of the likelihood function for the given model, and let k be the number of estimated parameters in the model. The AIC value of the model is: AIC = 2k - 2ln(L)
+Given a set of candidate models for the given data, the preferred mo del is the one with the minimum AIC value. AIC rewards goodness of f it (as assessed by the likelihood function), while including a penal ty against overfitting (big k).

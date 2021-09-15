@@ -1,0 +1,545 @@
+---
+title: "AMS394_note1"
+author: "Weihao Wang"
+date: "2021/4/30"
+output: html_document
+---
+
+**1. Installation of R and packages**
+
+The way to obtain R is to download it from one of the CRAN (Comprehensive R Archive Network) sites. The main site is
+
+https://cran.r-project.org/
+
+R is available to be freely downloaded to your computer:
+1. Go to Google and type: R
+2. You will get the following website: https://www.r-project.org/ 3. Go to download R and choose a mirror, for example, UCLA.
+4. Go ahead and download R!
+
+Note: I highly recommend the Quick_R website: http://www.statmethods.net/
+
+You can also download the free R IDE (Integrated Development Environment), R studio, from the following link.
+
+https://www.rstudio.com/products/rstudio/download/
+
+**Package installation:** To work through the examples and exercises in this book, you should install the ISwR package, which contains the data sets. If you are connected to the Internet, you can start R and from the Windows and Macintosh versions use their convenient menu interfaces.
+
+Tools -- Install Packages
+
+On other platforms, you can type
+
+> install.packages("ISwR")
+
+Then you may need to load the package you need for your work at the command prompt, e.g.,
+
+> library(ISwR)
+
+**2. First steps**
+
+Starting R is straightforward, but the method will depend on your computing platform.
+
+2.1 Calculating an arithmetic expression
+
+One of the simplest possible tasks in R is to enter an arithmetic expression and receive a result.
+```{r}
+exp(-2)
+```
+
+Exercises: Computing
+1) log(3.14), log10(3.14), log(3.14, 20)
+2) sin(2.1)
+3) 3^2.55
+4) sqrt(38)
+
+The [1] in front of the result is part of R’s way of printing numbers and vectors. It is not useful here, but it becomes so when the result is a longer vector. The number in brackets is the index of the first number on that line. Consider the case of generating 20 random numbers from a normal distribution:
+```{r}
+rnorm(20)
+x = rnorm(n = 50, mean = 5, sd = 2)
+```
+
+Use ?rnorm to read the help document of the function.
+
+2.2 Assignments
+
+To assign the value 2 to the variable x, you can enter
+```{r}
+x <- 2
+x
+y = 2
+y
+3 -> z
+z
+```
+
+2.3 Vectorized arithmetic
+
+The construct c(...) is used to define vectors.
+```{r}
+weight.1 = c(60, 72, 57, 90, 95, 72)
+weight.1
+(weight.2 = c(60, 72, 57, 90, 95, 72, 88))
+c(weight.1, weight.2)
+```
+
+You can do calculations with vectors just like ordinary numbers, as long as they are of the same length.
+```{r}
+weight <- c(60, 72, 57, 90, 95, 72)
+height <- c(1.75, 1.80, 1.65, 1.90, 1.74, 1.91)
+bmi <- weight/height^2
+bmi
+```
+
+It is in fact possible to perform arithmetic operations and calculate some basic statistics on vectors of different length.
+```{r}
+bmi^2
+length(bmi)
+sum(bmi)
+mean(bmi)
+sd(bmi)
+```
+
+Exercise: 
+(1) Compute the (A) median and (B) variance of ‘weight’
+(2) Compute the (A) covariance and (B) correlation of ‘weight’ and ‘height’ 
+(3) Implement the following operations:
+```{r}
+xbar <- sum(weight)/length(weight)
+weight - xbar
+sqrt(sum((weight - xbar)^2)/(length(weight) - 1))
+cor(weight,height) 
+cov(weight,height)/sd(weight)/sd(height)
+```
+
+2.4 Standard statistical procedures
+
+You could run standard T-test to assess whether the six persons’ BMI can be assumed to have mean 22.5 given that they come from a normal distribution.
+```{r}
+t.test(bmi, mu=22.5, alternative = "greater")
+t.test(bmi, mu=22.5, alternative = "less")
+t.test(bmi, mu=22.5, alternative = "two.sided")
+t.test(bmi, mu=22.5)
+t.test(bmi, mu=22.5, conf.level = .99)
+# H0: mean(bmi) = mu vs. H1: mean(bmi) != mu
+```
+
+2.5 Graphics
+
+```{r}
+plot(height, weight)
+plot(height, weight, pch=2)
+x <- c(1.65, 1.70, 1.75, 1.80, 1.85, 1.90)
+lines(x, 22.5 * x^2)
+plot(height, weight, pch=2,type='l')
+```
+
+**3. R language essentials**
+
+3.1 Expressions and objects
+
+The basic interaction mode in R is one of expression evaluation. The user enters an expression; the system evaluates it and prints the result. All R expressions return a value (possibly NULL), but sometimes it is “invisible” and not printed.
+
+```{r}
+x <- NULL
+```
+
+3.2 Functions and arguments
+
+Many things in R are done using function calls, commands that look like an application of a mathematical function of one or several variables; for example, log(x).
+
+3.3 Vectors
+
+We have already seen numeric vectors. There are two further types, character vectors and logical vectors. A character vector is a vector of text strings, whose elements are specified and printed in quotes:
+```{r}
+c("Huey","Dewey","Louie")
+c('Heey', 'Dewey', 'Louie')
+```
+
+Logical vectors are constructed using the c function just like the other vector types:
+```{r}
+c(T,T,F,T)
+c(TRUE, TRUE, FALSE, TRUE)
+```
+
+Exercise: 
+(1) Try the following R script: 
+a<-c(2, 3, exp(3.2), sin(8))
+a>3
+
+3.4 Quoting and escape sequences
+
+```{r}
+cat("Huey","Dewey","Louie", "\n")
+cat("What is \"R\"?\n")
+cat("how are \"you\"?\n");cat("m")
+```
+
+3.5 Missing values
+
+R allows vectors to contain a special NA value as missing values.
+```{r}
+a<-"NA"
+a<-NA
+```
+
+3.6 Functions that create vectors
+
+We introduce three functions, c, seq, and rep, that are used to create vectors in various situations.
+```{r}
+c(42,57,12,39,1,3,4)
+x <- c(1, 2, 3)
+y <- c(10, 20)
+c(x, y, 5)
+
+x <- c(red="Huey", blue="Dewey", green="Louie")
+x
+names(x)
+
+c(FALSE, 3)
+c(pi, "abc")
+c(FALSE, "abc")
+
+seq(4,9)
+seq(4,10,2)
+4:9
+
+oops <- c(7,9,13)
+rep(oops,3)
+rep(oops,1:3)
+```
+
+3.7 Matrices and arrays
+
+```{r}
+x <- 1:12
+dim(x) <- c(3,4) # number of rows;number of cols
+x
+matrix(1:12,nrow=3,byrow=F) # create a matrix
+matrix(1:12,nrow=3,byrow=T)
+x <- matrix(1:12,nrow=3,byrow=T)
+rownames(x) <- LETTERS[1:3]
+x
+t(x)
+#?t
+#??transpose
+colnames(x)<-letters[1:4] 
+x
+colnames(x)<-c("j","a","b","c")
+x
+cbind(A=1:4,B=5:8,C=9:12)
+rbind(A=1:4,B=5:8,C=9:12)
+cbind(height, weight, bmi)
+cbind(height, weight, bmi)[2,1]
+```
+
+3.8 Lists
+
+It is sometimes useful to combine a collection of objects into a larger composite object. This can be done using lists.
+```{r}
+intake.pre <- c(5260,5470,5640,6180,6390,6515,6805,7515,7515,8230,8770)
+intake.post <- c(3910,4220,3885,5160,5645,4680,5265,5975,6790,6900,7335)
+mylist <- list(before=intake.pre,after=intake.post)
+mylist
+mylist$before
+
+rbind(before=intake.pre,after=intake.post)[2,]
+```
+
+3.9 Data frame
+
+A data frame corresponds to what other statistical packages call a “data matrix” or a “data set”. You can create data frames from preexisting variables:
+```{r}
+d <- data.frame(intake.pre,intake.post)
+d
+d$intake.pre
+d[1,1]
+```
+
+3.10 Indexing
+
+If you need a particular element in a vector, for instance the premenstrual energy intake for woman no. 5, you can do
+```{r}
+intake.pre[5] 
+intake.pre[c(3,5,7)]
+v <- c(3,5,7); intake.pre[v]
+intake.pre[1:5] 
+intake.pre[-c(3,5,7)]
+```
+
+3.11 Conditional selection
+
+```{r}
+intake.post[which(intake.post>7000)]
+intake.post[intake.post > 7000] 
+intake.post[intake.pre > 7000 & intake.pre <= 8000] 
+intake.pre > 7000 & intake.pre <= 8000
+d <- data.frame(intake.pre,intake.post) 
+d[5,1]
+d[5,]
+d[d$intake.pre>7000,] #[row, col]
+sel <- d$intake.pre>7000
+sel
+```
+
+3.12 subset and transform
+
+The indexing techniques for selecting out parts of a data frame are logical but sometimes cumbersome, the subset function can make it a little easier. And transform can add transformed variables to a data frame.
+```{r}
+library(ISwR)
+data(thuesen)
+thue2 <- subset(thuesen, blood.glucose<7)
+thue2
+thue3 <- transform(thuesen, log.gluc = log(blood.glucose))
+thue3
+```
+
+3.13 Grouped data and data frames
+
+```{r}
+data(energy)
+energy
+energy$expend[energy$stature=="lean"]
+(data <-energy$expend)
+(group <-energy$stature)
+split(data,group) # split the values by the group levels
+```
+
+3.14 sorting
+
+```{r}
+intake.post
+sort(intake.post, decreasing = F)
+order(intake.post)
+intake.post[order(intake.post)]
+```
+
+3.15 implicit loops
+
+```{r}
+lapply(thuesen, mean, na.rm=T)
+sapply(thuesen, mean, na.rm=T)
+```
+
+The former function always return a list(hence the "l"), and the latter tries to simplify (hence "s") the result as a vector or a matrix.
+```{r}
+m <- matrix(rnorm(12),4)
+m <- matrix(data = rnorm(12), nrow = 4)
+# [row, col]
+apply(m, 2, min)
+apply(m, 1, min)
+energy
+tapply(data, group, median)
+```
+
+**4. The graphics subsystem**
+
+4.1 plot layout
+
+A standard x-y plot has an x and a y title lavel generated from the expressions being plotted.
+```{r}
+x <- runif(50,0,2) # random sample of an Uniform distribution
+y <- runif(50,0,2)
+plot(x, y, main="Main title", sub="subtitle", xlab="x-label", ylab="y-label")
+```
+
+
+Inside the plotting region, you can place points and lines that are either specified in the plot call or added later with points and lines. You can also place a text with
+```{r}
+plot(x, y, main="Main title", sub="subtitle", xlab="x-label", ylab="y-label")
+text(0.6,0.6,"Critical point")
+abline(h=.6,v=.6)
+abline(a = 0, b = 1) # y = a+b*x
+```
+
+abline can plot the line y = a + bx, when given a and b as arguments, but can also draw horizontal and vertical lines.
+The margin coordinates are used by the mtext function. They can be demonstrated as follows:
+```{r}
+plot(x, y, main="Main title", sub="subtitle", xlab="x-label", ylab="y-label")
+text(0.6,0.6,"text at (0.6,0.6)")
+abline(h=.6,v=.6)
+for (side in 1:4) mtext(-1:4,side=side,at=.7,line=-1:4)
+mtext(paste("side",1:4), side=1:4, line=-1,font=2)
+```
+
+4.2 Building a plot from pieces
+
+
+High-level plots are composed of elements, each of which can also be drawn separately.
+```{r}
+plot(x, y, type="n", xlab="", ylab="")
+plot(x, y, type="n", xlab="", ylab="", axes=F)
+```
+To add the plot elements, evaluate the following:
+```{r}
+plot(x, y, type="n", xlab="", ylab="", axes=F)
+points(x,y)
+axis(1)
+axis(2,at=seq(0,2,0.2))
+box()
+title(main="Main title", sub="subtitle",xlab="x-label", ylab="y-label")
+```
+
+4.3 Combining plots
+
+Consider overlaying a histogram with a normal density
+```{r}
+x <- rnorm(100)
+hist(x,freq=F)
+curve(dnorm(x),add=T)
+```
+
+**5. R programming**
+
+It is possible to write your own R functions.
+```{r}
+add = function(a=1,b=1){
+  result = a + b
+  return(result)
+}
+add(2,3)
+add()
+
+hist.with.normal <- function(x, xlab=deparse(substitute(x)),...){
+  h <- hist(x, plot=F, ...)
+  s <- sd(x)
+  m <- mean(x)
+  ylim <- range(0,h$density,dnorm(0,sd=s))
+  hist(x, freq=F, ylim=ylim, xlab=xlab, ...)
+  curve(dnorm(x,m,s), add=T)
+}
+hist.with.normal(x)
+
+histwithcurve<-function(x) {
+  hist(x,freq=F)
+  curve(dnorm(x),add=T)
+}
+histwithcurve(x)
+
+graph.data<-function(x,y){
+  plot(x, y, type="n", xlab="", ylab="", axes=F)
+  points(x,y)
+  axis(2,at=seq(0.0,2.2,0.3))
+  axis(1)
+  box()
+  title(main="ok")
+  title(sub="sub")
+}
+x <- runif(50,0,2)
+y <- runif(50,0,2)
+graph.data(x,y)
+
+my.function <- function(x){
+  cat("The positive numbers are", "\n")
+  cat(x[x>0], "\n")
+  cat("The negative numbers are", "\n")
+  cat(x[x<0], "\n")
+}
+x <- rnorm(100)
+my.function(x)
+```
+
+5.1 Flow control
+
+Consider the following code that implements a version of Newton’s method for calculating the square root of y.
+
+(1) while(condition) expression
+```{r}
+y <- 12345
+x <- y/2
+while (abs(x*x-y) > 1e-10) x <- (x + y/x)/2
+x
+x^2
+```
+
+(2) repeat
+```{r}
+x <- y/2
+repeat {
+  x <- (x + y/x)/2
+  if (abs(x*x-y) < 1e-10) break
+}
+x
+x^2
+```
+
+(3) for loop
+```{r}
+x <- seq(0, 1,.05)
+plot(x, x, ylab="y", type="l")
+for ( j in 2:8 ) lines(x, x^j)
+
+for(i in letters[1:5]){
+  cat("The letter is", "\n")
+  cat(i, "\n")
+}
+```
+
+5.2 Classes and generic functions
+
+Object-oriented programming is about creating coherent systems of data and methods that work upon them. A prototype example is the print method: It makes sense to print many kinds of data objects, but the print layout will depend on what the data object is.
+```{r}
+t.test(bmi, mu=22.5)$p.value
+test = t.test(bmi, mu=22.5)
+test$statistic
+```
+
+**6. Session management**
+
+6.1 Workspace
+
+All variables created in R are stored in a common workspace. To see which variables are defined in the workspace, you can use the function ls (list). you can delete some of the objects and this is done using rm (remove).
+
+```{r}
+ls()
+rm(height, weight) # rm: to remove the varaibles/vectors/datasets
+rm(list=ls()) ## the entire workspace will be cleared
+save.image() ## save the workplace to a file called “.RData”
+save.image("~/Desktop/1.RData")
+load("~/Desktop/1.RData")
+```
+
+6.2 Packages
+
+An R installation contains one ormore libraries of packages. Some of these packages are part of the basic installation. Others can be downloaded from CRAN, which currently hosts over 1000 packages for various purposes. You can even create your own packages.
+A package is loaded into R using the library command, so to load the survival package you should enter
+```{r}
+# install.packages("survival")
+library(survival)
+detach("package:survival")
+```
+
+6.3 Build-in Data
+
+Many packages, both inside and outside the standard R distribution, come with built-in data sets. Such data sets can be rather large, so it is not a good idea to keep them all in computer memory at all times.
+```{r}
+data(thuesen)
+thuesen$blood.glucose # dataset name $ variable name
+attach(thuesen)
+blood.glucose # variable name
+detach(thuesen)
+```
+
+**7. Reading data from a file**
+
+```{r}
+#setwd("~/Desktop/SBU/AMS 394/summer 2021/R")
+logret<- read.table("d_logret_6stocks.txt",header=T)
+logret
+dim(logret) # number of rows/cols
+names(logret)
+logret[1:10,-c(2,4)]
+
+library(ISwR)
+data(thuesen)
+thuesen2<- transform(thuesen,log.gluc=log(blood.glucose))
+write.table(thuesen2,"~/Desktop/1.txt")
+#write.table(thuesen2, "c:/mydata.txt", sep="\t")
+write.csv(thuesen2,"~/Desktop/1.csv")
+read.table("http://www.sthda.com/upload/boxplot_format.txt")
+```
+
+**reference**
+
+• Introductory Statistics with R (2nd edition), by P. Dalgaard, Springer Nature
+
+• http://www.sthda.com/upload/boxplot_format.txt
+

@@ -1,0 +1,354 @@
+---
+title: "AMS394_note2"
+author: "Weihao Wang"
+date: "2021/5/2"
+output: html_document
+---
+
+**1. Probability and distributions**
+
+1.1. Random sampling
+
+The basic notion of a random sample is to deal from a well-shuffled pack of cards or picking numbered balls from a well-stirred urn.
+In R, you can simulate these situations with the sample function. If you want to pick five numbers at random from the set 1:40, then you can write
+```{r}
+sample(1:40,5)
+sample(c("H","T"), 10, replace=T)
+sample(c("succ", "fail"), 10, replace=T, prob=c(0.9, 0.1))
+```
+
+1.2. Probability calculations and combinatorics
+
+In R, the choose function can be used to calculate the number of ways to choose 5 numbers out of 40.
+```{r}
+choose(40,5)
+prod(40:36)/prod(1:5)
+factorial(40)/factorial(5)/factorial(35)
+```
+
+1.3. Discrete and continuous distributions
+
+Discrete: Binomial distribution (binom), geometric distribution (geom), Poisson distribution (pois), ...
+Continuous: Normal (norm), Beta (beta), Gamma (gamma), log-normal (lnorm), Cauchy (cauchy), Chi-squared (chisq), Exponential (exp), F (f), Logistic (logis), Negative binomial (nbinom), Student's t (t), Uniform (unif), ...
+
+Prefix the name given here by 'd' for the density, 'p' for the CDF, 'q' for the quantile function and 'r' for simulation (random deviates). The first argument is x for dxxx, q for pxxx, p for qxxx and n for rxxx. We next discuss and give some examples on these functions.
+
+**Distributions in R**
+beta: beta - rbeta dbeta pbeta qbeta
+binomial: binom
+cauchy: cauchy
+Chi-square: chisq
+exponential: exp
+F: f
+gamma: gamma
+geometric: geom
+log-normal: lnorm
+logistic: logis
+Negative binomial: nbinom
+Normal: norm
+Poisson: pois
+Student's t: t
+uniform: unif
+Weibull: weibull
+
+1) Densities
+```{r}
+x <- seq(-4,4,0.1)
+plot(x,dnorm(x),type="l")
+curve(dnorm(x), from=-4, to=4)
+
+x <- seq(0,1,0.01) 
+plot(x,dbeta(x,4,5),type="l") 
+curve(dbeta(x,4,5), from=0, to=1)
+
+x <- seq(0,100,1) 
+plot(x,dchisq(x,40),type="l") 
+curve(dchisq(x,40), from=0, to=100)
+
+x <- seq(0,100,1) 
+plot(x,dgamma(x,30),type="l") 
+curve(dgamma(x,30), from=0, to=100)
+```
+
+For discrete distributions, where variables can take on only distinct values, it is preferable to draw a pin diagram, here for the binomial distribution with n = 50 and p = 0.33:
+```{r}
+x <- 0:50
+plot(x,dbinom(x,size=50,prob=.33),type="h") 
+#curve(dbinom(x,size=50,prob=.33), from=0, to=50)
+x <- 0:50 
+plot(x,dpois(x,10),type="h")
+```
+
+2) Cumulative distribution functions
+d-density
+p-cdf
+
+```{r}
+pnorm(160,mean=132,sd=13)
+pbinom(16,size=20,prob=.5)
+pbeta(0.8,4,5)
+pchisq(100,40)
+pchisq(10,40)
+pgamma(100,30)
+pgamma(10,30)
+ppois(2,10)
+
+x <- seq(-4,4,0.1) 
+plot(x,pnorm(x),type="l") 
+curve(pnorm(x), from=-4, to=4)
+
+x <- 0:50
+plot(x,pbinom(x,size=50,prob=.33)) 
+#curve(pbinom(x,size=50,prob=.33), from=0, to=50)
+```
+
+3) Quantiles
+
+If we have n normally distributed observations with the same mean μ and standard deviation sigma, then it is known that the average 'xbar' is normally distributed around μ with standard deviation sigma/sqrt(n). A 95% confidence interval for μ can be obtained as
+xbar + sigma/sqrt(n) × N0.025 <= μ<= xbar + s/pn × N0.975 
+where N0.025 is the 2.5% quantile in the normal distribution.
+```{r}
+qnorm(0.5) 
+qnorm(0.5,1,2) 
+qnorm(0.025)
+
+xbar=83
+sigma=12
+n<-5
+sem<-sigma/sqrt(n)
+sem 
+
+xbar+sem*qnorm(0.025) 
+xbar+sem*qnorm(0.975) 
+xbar-sem*qnorm(0.025)
+qbinom(0.5,size=20,prob=.5) 
+
+qbeta(0.5,4,5) 
+qbeta(1,4,5)
+qchisq(0.5,40)
+qchisq(1,40)
+qgamma(0.5,30)
+qgamma(1,30)
+qpois(0.5,10)
+qpois(1,10)
+```
+
+4) Random numbers
+
+Computer generates sequences of “pseudo-random” numbers, which for practical purposes behave as if they were drawn randomly
+```{r}
+rnorm(10,mean=7,sd=5)
+rbinom(10,size=20,prob=.5) 
+rbeta(10,4,5)
+rchisq(30,40)
+rgamma(50,30)
+rpois(20,10)
+```
+
+**2. Descriptive statistics and graphics**
+
+2.1. Summary statistics for a single group
+
+It is easy to calculate simple summary statistics with R. Here is how to calculate the mean, standard deviation, variance, and median.
+```{r}
+x <- rnorm(50)
+mean(x)
+sd(x) # standard deviation
+var(x) # variance
+sd(x)^2
+median(x)
+quantile(x)
+pvec <- seq(0,1,0.1)
+quantile(x,pvec)
+quantile(x,c(0.1,0.4))
+
+library(ISwR)
+data(juul)
+juul
+dim(juul)
+head(juul)
+juul[1:10,]
+attach(juul)
+names(juul)
+mean(igf1)
+igf1
+mean(igf1,na.rm=T)
+sum(igf1)
+sum(igf1,na.rm=T)
+sum(is.na(igf1)) # number of missing values
+sum(!is.na(igf1)) # number of nonmissing values
+summary(igf1) # important
+summary(juul)
+
+str(juul) # important
+juul<-transform(juul,sex=factor(sex, labels=c("f","m")),menarche=factor(menarche, labels=c("no","yes")),tanner=factor(tanner, labels=c("one","two","three","four","five")))
+
+juul$sex = factor(juul$sex, labels=c("f","m"))
+str(juul)
+```
+
+2.2 Graphic display of distributions --- Histograms, empirical distributions, Q-Q plot, Boxplot
+
+```{r}
+x<-rnorm(50) 
+hist(x)
+
+x<-c(1.5,2.5,3.5,4.5,5.5,6.5,8.5,9.5,12.5) 
+y<-c(5,7,12,2,1,4,14,2,3)
+z<-rep(x,y)
+brk<-c(0,1,2,3,5,7,9,10,11,13) 
+hist(z,breaks=brk)
+
+### empirical distribution function
+x<-rnorm(100)
+n <- length(x)
+plot(sort(x),(1:n)/n,type="s",ylim=c(0,1)) 
+plot(sort(x),(1:n)/n,type="l",ylim=c(0,1)) 
+plot(x,pnorm(x))
+```
+
+Empirical cumulative distribution function is defined as the fraction of data smaller than or equal to x. That is , if x is the kth smallest observation, the the proportion k/n of the data is smaller than or equal to x.
+
+```{r}
+#qq plot 
+qqnorm(x)
+```
+
+```{r}
+# Box plot
+data(IgM)
+par(mfrow=c(1,2))
+boxplot(IgM)
+boxplot(log(IgM))
+par(mfrow=c(1,1))
+```
+
+mfrow graphical parameter should read as” multiframe, rowwise, 1*2 layout” individual plots are organized in 1 row and 2 columns.
+```{r}
+par(mfrow=c(1,2))
+boxplot(log(IgM))
+boxplot(IgM)
+par(mfcol=c(2,2))
+boxplot(log(IgM))
+boxplot(IgM)
+boxplot(sin(IgM))
+boxplot(cos(IgM))
+par(mfrow=c(2,2))
+boxplot(log(IgM))
+boxplot(IgM)
+boxplot(sin(IgM))
+boxplot(cos(IgM))
+par(mfrow = c(1,1))
+```
+
+2.3. Summary statistics by groups
+
+```{r}
+data(red.cell.folate)
+attach(red.cell.folate)
+red.cell.folate
+xbar=tapply(folate,ventilation,mean)
+s=tapply(folate,ventilation,sd)
+n=tapply(folate,ventilation,length)
+cbind(mean=xbar,std.dev=s,n=n)
+data(juul)
+tapply(igf1,tanner,mean)
+tapply(igf1,tanner,mean,na.rm=T) #na.rm = T --- deal with those missing values
+```
+
+na.rm=T as a parameter to mean to make it exclude the missing values.
+
+4.4. Graphics for grouped data
+
+Histograms
+```{r}
+data(energy)
+attach(energy)
+expend.lean<-expend[stature=="lean"]
+expend.obese<-expend[stature=="obese"]
+par(mfrow=c(2,1))
+hist(expend.lean,breaks=10,xlim=c(5,13),ylim=c(0,4),col="white")
+hist(expend.obese,breaks=10,xlim=c(5,13),ylim=c(0,4),col="grey")
+par(mfrow=c(1,1))
+```
+
+Parallel boxplot
+```{r}
+boxplot(expend~stature)
+boxplot(expend.lean , expend.obese)
+```
+
+Stripcharts
+```{r}
+opar<-par(mfrow=c(2,2),mex=0.8,mar=c(3,3,2,1)+.1)
+stripchart(expend~stature)
+stripchart(expend~stature,method="stack")
+stripchart(expend~stature,method="jitter")
+stripchart(expend~stature,method="stack",jitter=0.03)
+par(opar)  #reestablished
+```
+
+2.5. Tables
+
+Categorical data are usually described in the form of tables. A two-way table can be entered as a matrix object.
+```{r}
+caff.marital <- matrix(c(652,1537,598,242,36,46,38,21,218, 327,106,67), nrow=3,byrow=T)
+colnames(caff.marital) <- c("0","1-150","151-300",">300")
+rownames(caff.marital) <- c("Married","Prev.married","Single")
+caff.marital
+```
+
+Furthermore, you can name the row and column names as follows. This is particularly useful if you are generating many tables with similar classification criteria.
+```{r}
+names(dimnames(caff.marital)) <- c("marital","consumption") # 1-row, 2-col
+caff.marital
+```
+
+Like any matrix, a table can be transposed with the t function:
+```{r}
+t(caff.marital)
+```
+
+
+Exercise: Construct the following table which summarize the number of people smoking and nonsmoking in a class.
+    smoking   nonsmoking
+male   23       45
+female 34       54
+
+```{r}
+data(juul)
+attach(juul)
+table(sex) # 1 variable - counting
+table(sex,menarche)
+table(menarche,tanner)
+table(sex,menarche,tanner)
+table(tanner,sex)
+margin.table(table(tanner,sex),1)
+margin.table(table(tanner,sex),2)
+prop.table(table(tanner,sex),1)
+prop.table(table(tanner,sex),2)
+table(tanner,sex)/sum(table(tanner,sex))  #grand total of the table
+```
+
+2.6. Graphical display of tables
+
+1) barplot
+```{r}
+barplot(prop.table(t(caff.marital)),legend.text=colnames(caff.marital),col=c("white","blue","green","black "))
+```
+
+2) dotcharts
+```{r}
+dotchart(t(caff.marital))
+dotchart(caff.marital)
+```
+
+3) Pie charts
+```{r}
+opar<- par (mfrow=c(2,2), mex=0.8, mar=c(1,1,2,1))
+slices<- c("white", "grey80", "grey50", "black") 
+pie(caff.marital["Married",], main="Married", col=slices) 
+pie(caff.marital["Prev.married",], main="Previously married", col=slices) 
+pie(caff.marital["Single",], main="Single", col=slices)
+par(opar)
+```

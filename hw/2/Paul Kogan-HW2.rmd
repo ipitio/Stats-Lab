@@ -1,0 +1,48 @@
+---
+title: "Paul Kogan-HW1"
+author: "Paul Kogan"
+date: "2021/9/14"
+output: pdf_document
+---
+
+```{r, echo = FALSE}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, evir, ISwR, MASS, rmarkdown)
+options(warn = -1)
+```
+
+**1**
+```{r}
+cat("a)\t", pnorm(16, mean = 15, sd = 3, lower.tail = FALSE), "\nb)\t",
+    pchisq(8, 10), "\nc)\t", dbinom(5, 10, 0.4), "\nd)\t", dpois(5, 3))
+```
+
+**2**
+```{r}
+table <- as.table(array(c(25, 18, 13, 6, 121, 92, 130, 87), dim = c(4, 2),
+                dimnames = list(c("18-20", "21-23", "24-25", ">25"),
+                c("Yes", "No"))))
+names(attributes(table)$dimnames) <- c("Age", "Accidents")
+table
+```
+
+**3**
+```{r}
+plot(evir::emplot(rexp(100, 2)))
+```
+
+**4**
+```{r}
+x <- rnorm(50)
+boxplot(x, log(abs(x)), main = "x vs log(abs(x))",
+        names = c("x", "log(abs(x))"))
+```
+
+**5** *a*
+```{r}
+hist(ISwR::react)
+```
+**5** *b*
+```{r}
+MASS::truehist(ISwR::react)
+```
