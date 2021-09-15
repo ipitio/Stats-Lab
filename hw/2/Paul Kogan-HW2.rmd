@@ -28,7 +28,7 @@ table
 
 **3**
 ```{r}
-plot(evir::emplot(rexp(100, 2)))
+evir::emplot(rexp(100, 2))
 ```
 
 **4**
