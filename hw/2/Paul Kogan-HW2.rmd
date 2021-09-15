@@ -38,11 +38,11 @@ boxplot(x, log(abs(x)), main = "x vs log(abs(x))",
         names = c("x", "log(abs(x))"))
 ```
 
-**5** *a*
+**5** *(1)*
 ```{r}
 hist(ISwR::react, breaks = 18)
 ```
-**5** *b*
+**5** *(2)*
 ```{r}
 MASS::truehist(ISwR::react)
 ```
