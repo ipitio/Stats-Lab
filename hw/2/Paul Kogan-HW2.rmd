@@ -7,7 +7,7 @@ output: pdf_document
 
 ```{r, echo = FALSE}
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(evir, ISwR, MASS, rmarkdown)
+pacman::p_load(evir, ISwR, MASS)
 options(warn = -1)
 ```
 
