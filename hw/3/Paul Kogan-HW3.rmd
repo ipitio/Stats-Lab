@@ -1,0 +1,16 @@
+---
+title: "Paul Kogan-HW3"
+author: "Paul Kogan"
+date: "2021/9/20"
+output: pdf_document
+---
+
+```{r}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load()
+options(warn = -1)
+```
+
+**1**
+```{r}
+```
