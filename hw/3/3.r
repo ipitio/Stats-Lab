@@ -15,12 +15,17 @@ this_dir <-  function() {
 }
 setwd(this_dir())
 
-rjct <- function(lvl) paste("< alpha =", lvl,
-    "so reject the null hypothesis\n\t\t\t   that the")
-conc <- function(test, lvl = 1 - attr(test$conf.int, "conf.level")) {
+rjct <- function(lvl) paste("<= alpha =", lvl,
+    "so reject the null\n\t\t\thypothesis that the")
+conc <- function(test, hyp, lvl = 1 - attr(test$conf.int, "conf.level"),
+                 f = T) {
     lvl <- ifelse(length(lvl) == 0, 0.05, lvl)
-    ifelse(test$p.value <= lvl, rjct(lvl), rjct(lvl) %>%
-        str_replace_all(c("<" = ">", "so" = "so fail to")))
+    val <- test$p.value
+    str <- paste("conclusion: p-value =", val,
+           ifelse(val <= lvl, rjct(lvl), rjct(lvl) %>%
+           str_replace_all(c("<=" = ">", "so" = "so fail to"))), hyp)
+    if (f) cat(str)
+    invisible(str)
 }
 
 # Q1
@@ -30,34 +35,29 @@ intel <- stock$Intel
 pfizer <- stock$Pfizer
 ip_var <- var.test(intel, pfizer)
 t_i <- t.test(intel)
-w_i <- wilcox.test(intel, pfizer, conf.int = T)
+w_i <- wilcox.test(intel, conf.int = T)
 t_ip <- t.test(intel, pfizer, var.equal = ip_var$p.value > 0.05)
 w_ip <- wilcox.test(intel, pfizer, conf.int = T)
 
 cat("a:\n")
 t_i
-cat("conclusion: p-value =", t_i$p.value, conc(t_i),
-    "mean of intel return is zero\n\n")
+conc(t_i, "mean of intel return is zero\n\n")
 
 cat("b:\n")
 w_i
-cat("conclusion: p-value = ", w_i$p.value, conc(w_i),
-    "mean of intel return is zero\n\n")
+conc(w_i, "mean of intel return is zero\n\n")
 
 cat("c:\n")
 t_ip
-cat("conclusion: p-value =", t_ip$p.value, conc(t_ip),
-    "mean returns of pfizer and intel are the same\n\n")
+conc(t_ip, "mean returns of pfizer and intel are the same\n\n")
 
 cat("d:\n")
 w_ip
-cat("conclusion: p-value =", w_ip$p.value, conc(w_ip),
-    "mean returns of pfizer and intel are the same\n\n")
+conc(w_ip, "mean returns of pfizer and intel are the same\n\n")
 
 cat("e:\n")
 ip_var
-cat("conclusion: p-value =", ip_var$p.value, conc(ip_var),
-    "variances of returns of pfizer and intel are the same\n\n")
+conc(ip_var, "variances of returns of pfizer and intel are the same\n\n")
 
 # Q2
 
@@ -66,8 +66,7 @@ bp5 <- c(384, 369, 354, 367, 375, 423)
 t_bp <- t.test(bp26, bp5, "greater",
                var.equal = var.test(bp26, bp5)$p.value > 0.05)
 t_bp
-cat("conclusion: p-value =", t_bp$p.value, conc(t_bp),
-    "mean blood pressures are the same\n\n")
+conc(t_bp, "mean blood pressures are the same\n\n")
 
 # Q3
 
@@ -76,31 +75,28 @@ affected <- c(488, 478, 480, 426, 440, 410, 458, 460)
 not_a <- c(484, 478, 492, 444, 436, 398, 464, 476)
 s_aff <- shapiro.test(affected)
 s_not <- shapiro.test(not_a)
-s_affc <- conc(s_aff, lvl)
-s_notc <- conc(s_not, lvl)
+s_affc <- conc(s_aff, "data are normal\n", lvl, F)
+s_notc <- conc(s_not, "data are normal\n", lvl, F)
 v_a <- var.test(affected, not_a)
 t_aff <- t.test(affected, not_a, conf.level = 1 - lvl,
                 var.equal = v_a$p.value > lvl)
-assumptions <- c(paste("data in each group are ", sep = "",
+assumptions <- c(paste0("data in each group are ",
     ifelse(grepl("<", s_affc, F, F, T) ||
         grepl("<", s_notc, F, F, T), "not ", ""), "normal"),
-    paste("variances of the groups are ",
-        ifelse(!v_a$p.value > lvl, "not ", ""), "equal", sep = ""))
+    paste0("variances of the groups are ",
+        ifelse(!v_a$p.value > lvl, "not ", ""), "equal"))
 
 cat("a:\n\tAffected")
 s_aff
-cat("conclusion: p-value =", s_aff$p.value, s_affc,
-    "data are normal\n\n\tNot Affected")
+cat(s_affc)
+cat("\n\tNot Affected")
 s_not
-cat("conclusion: p-value =", s_not$p.value, s_notc,
-    "data are normal\n")
+cat(s_notc)
 v_a
-cat("conclusion: p-value =", s_not$p.value, s_notc,
-    "variances are equal\n\nassumptions checked:\t")
+conc(v_a, "variances are equal\n\nassumptions checked:\t")
 for (assumption in assumptions) cat(assumption, "\n\t\t\t\t\t\t")
 t_aff
-cat("conclusion: p-value =", t_aff$p.value, conc(t_aff),
-    "corneal thickness is equal for affected versus unaffected eyes\n\n")
+conc(t_aff, "corneal thickness is equal in affected v unaffected eyes\n\n")
 cat("b:\t", t_aff$conf.int[1:2], "\n\n")
 
 # Q4
@@ -112,10 +108,9 @@ t_time <- t.test(time, alternative = "greater", mu = mean, conf.level = .95)
 
 cat("a:\n")
 s_time
-cat("conclusion: p-value =", s_time$p.value, conc(s_time),
-    "data are normal\n\n")
+conc(s_time, "data are normal\n\n")
 
 cat("b:\n")
 t_time
-cat("conclusion: p-value =", t_time$p.value, conc(t_time),
-    "mean time for a warehouse to fill a buyers order is", mean, "minutes\n\n")
+conc(t_time, paste("mean time for a warehouse to fill a buyers order is", mean,
+     "minutes\n\n"))
