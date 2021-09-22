@@ -6,13 +6,12 @@ output: pdf_document
 ---
 
 ```{r}
-rjct <- function(lvl) paste("<", lvl,
-                            "so reject the null hypothesis that the\n")
-fail <- function(lvl) rjct(lvl) %>%
-    str_replace_all(c("<" = ">", "so" = "so fail to"))
+rjct <- function(lvl) paste("< alpha =", lvl,
+    "so reject the null hypothesis\n\t\t\t   that the")
 conc <- function(test, lvl = 1 - attr(test$conf.int, "conf.level")) {
-  lvl <- ifelse(length(lvl) == 0, 0.05, lvl)
-  ifelse(test$p.value > lvl, fail(lvl), rjct(lvl))
+    lvl <- ifelse(length(lvl) == 0, 0.05, lvl)
+    ifelse(test$p.value <= lvl, rjct(lvl), rjct(lvl) %>%
+        str_replace_all(c("<" = ">", "so" = "so fail to")))
 }
 ```
 
@@ -75,9 +74,10 @@ v_a <- var.test(affected, not_a)
 t_aff <- t.test(affected, not_a, conf.level = 1 - lvl,
                 var.equal = v_a$p.value > lvl)
 assumptions <- c(paste("data in each group are ", sep = "",
-ifelse(grepl("<", s_affc, F, F, T) || grepl("<", s_notc, F, F, T), "not ", ""),
-"normal"), paste("variances of the groups are ",
-ifelse(!v_a$p.value > lvl, "not ", ""), "equal", sep = ""))
+    ifelse(grepl("<", s_affc, F, F, T) ||
+        grepl("<", s_notc, F, F, T), "not ", ""), "normal"),
+    paste("variances of the groups are ",
+        ifelse(!v_a$p.value > lvl, "not ", ""), "equal", sep = ""))
 
 cat("a:\n\tAffected")
 s_aff
