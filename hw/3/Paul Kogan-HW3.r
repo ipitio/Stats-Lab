@@ -1,5 +1,5 @@
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(tidyverse, rmarkdown, scriptName, stringr)
+pacman::p_load(tidyverse, rmarkdown, scriptName)
 library(tidyverse)
 this_dir <-  function() {
     this_dir <- commandArgs() %>%
@@ -13,7 +13,6 @@ this_dir <-  function() {
     return(dirname(this_dir))
 }
 setwd(this_dir())
-rmarkdown::render(paste(stringr::str_replace_all(stringr::str_extract(
-                  scriptName::current_filename(),
-                  stringr::regex("[^\\/]+\\.r", T)),
+rmarkdown::render(paste(str_replace_all(str_extract(
+                  scriptName::current_filename(), regex("[^\\/]+\\.r", T)),
                   "~\\+~", " "), "md", sep = ""))

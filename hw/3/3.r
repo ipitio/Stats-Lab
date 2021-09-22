@@ -1,11 +1,20 @@
----
-title: "Paul Kogan-HW3"
-author: "Paul Kogan"
-date: "2021/9/21"
-output: pdf_document
----
+options(warn = -1)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse)
+library(tidyverse)
+this_dir <-  function() {
+    this_dir <- commandArgs() %>%
+      tibble::enframe(name = NULL) %>%
+      tidyr::separate(fill = "right", col = value, sep = "=",
+                      into = c("key", "value")) %>%
+      dplyr::filter(key == "--file") %>%
+      dplyr::pull(value)
+    if (length(this_dir) == 0)
+      this_dir <- rstudioapi::getSourceEditorContext()$path
+    return(dirname(this_dir))
+}
+setwd(this_dir())
 
-```{r}
 rjct <- function(lvl) paste("<", lvl,
                             "so reject the null hypothesis that the\n")
 fail <- function(lvl) rjct(lvl) %>%
@@ -14,10 +23,9 @@ conc <- function(test, lvl = 1 - attr(test$conf.int, "conf.level")) {
   lvl <- ifelse(length(lvl) == 0, 0.05, lvl)
   ifelse(test$p.value > lvl, fail(lvl), rjct(lvl))
 }
-```
 
-**1**
-```{r, results='hold'}
+# Q1
+
 stock <- read.table("d_logret_6stocks.txt", T)
 intel <- stock$Intel
 pfizer <- stock$Pfizer
@@ -51,9 +59,9 @@ cat("e:\n")
 ip_var
 cat("conclusion: p-value =", ip_var$p.value, conc(ip_var),
     "variances of returns of pfizer and intel are the same\n\n")
-```
-**2**
-```{r, results='hold'}
+
+# Q2
+
 bp26 <- c(152, 157, 179, 185, 178, 149)
 bp5 <- c(384, 369, 354, 367, 375, 423)
 t_bp <- t.test(bp26, bp5, "greater",
@@ -61,9 +69,9 @@ t_bp <- t.test(bp26, bp5, "greater",
 t_bp
 cat("conclusion: p-value =", t_bp$p.value, conc(t_bp),
     "mean blood pressures are the same\n\n")
-```
-**3**
-```{r, results='hold'}
+
+# Q3
+
 lvl <- .1
 affected <- c(488, 478, 480, 426, 440, 410, 458, 460)
 not_a <- c(484, 478, 492, 444, 436, 398, 464, 476)
@@ -94,9 +102,9 @@ t_aff
 cat("conclusion: p-value =", t_aff$p.value, conc(t_aff),
     "corneal thickness is equal for affected versus unaffected eyes\n\n")
 cat("b:\t", t_aff$conf.int[1:2], "\n\n")
-```
-**4**
-```{r, results='hold'}
+
+# Q4
+
 mean <- 25
 time <- c(28, 25, 27, 31, 10, 26, 30, 15, 55, 12, 24, 32, 28, 42, 38)
 s_time <- shapiro.test(time)
@@ -111,4 +119,3 @@ cat("b:\n")
 t_time
 cat("conclusion: p-value =", t_time$p.value, conc(t_time),
     "mean time for a warehouse to fill a buyers order is", mean, "minutes\n\n")
-```
