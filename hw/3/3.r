@@ -16,7 +16,7 @@ this_dir <-  function() {
 setwd(this_dir())
 
 rjct <- function(lvl) paste("< alpha =", lvl,
-    "so reject the null hypothesis\nthat the")
+    "so reject the null hypothesis\n\t\t\t   that the")
 conc <- function(test, lvl = 1 - attr(test$conf.int, "conf.level")) {
     lvl <- ifelse(length(lvl) == 0, 0.05, lvl)
     ifelse(test$p.value <= lvl, rjct(lvl), rjct(lvl) %>%
