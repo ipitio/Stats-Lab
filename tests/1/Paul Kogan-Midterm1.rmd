@@ -1,0 +1,71 @@
+---
+title: "Paul Kogan-Midterm1"
+author: "Paul Kogan"
+date: "2021/9/23"
+output: pdf_document
+---
+
+```{r}
+rjct <- function(lvl) paste("<= alpha =", lvl,
+    "so reject the null\n\t\t\thypothesis that the")
+conc <- function(test, hyp, lvl = 1 - attr(test$conf.int, "conf.level"),
+                 f = T) {
+    lvl <- ifelse(length(lvl) == 0, 0.05, lvl)
+    val <- test$p.value
+    str <- paste("conclusion: p-value =", val,
+           ifelse(val <= lvl, rjct(lvl), rjct(lvl) %>%
+           str_replace_all(c("<=" = ">", "so" = "so fail to"))), hyp)
+    if (f) cat(str)
+    invisible(str)
+}
+```
+**1**
+```{r, results='hold'}
+rand.vec <- rchisq(70, 5)
+rand.mat <- matrix(rand.vec, 10, 7, T)
+cat("Vector:\n")
+rand.vec
+cat("\n\tMatrix:\n")
+rand.mat
+cat("\n\tProduct:\t", prod(rand.mat[, 5]^2), "\n\n")
+```
+**2**
+```{r, results='hold'}
+prb <- c(.1, 0.3, 0.35, 0.25)
+len <- length(prb)
+rnd <- random::randomNumbers(1, len, 20, 1)
+amt <- as.integer(rnd / len)
+cat("1)\n", sample(sample(rnd, len), rnd, T, prb),
+    "\n2)\n", rmultinom(amt, rnd, prb))
+```
+**3**
+```{r, results='hold'}
+cat("1)\t", pchisq(11, 9),
+    "\n2)\t", dpois(7, 2),
+    "\n3)\t", pnorm(14, 12, 6, F),
+    "\n4)\t", pexp(5, .2) - pexp(2, .2),
+    "\n5)\t", dbinom(5, 12, .6), "\n\n")
+```
+**4**
+```{r, results='hold'}
+volume <- ISwR::lung$volume
+s_vol <- shapiro.test(volume)
+t_vol <- t.test(volume, mu = 3.5, alternative = "less")
+cat("1)\n")
+s_vol
+conc(s_vol, "data are normal\n\n")
+cat("2)\n")
+t_vol
+conc(t_vol, "mean of 'volume' is less than 3.5\n\n")
+```
+**5**
+```{r, results='hold'}
+lvl <- .1
+after <- c(49, 60, 65, 52, 58, 67)
+before <- c(75, 82, 79, 65, 77, 83)
+t_bp <- t.test(before, after, paired = T, var.equal =
+               var.test(before, after)$p.value > lvl,
+               alternative = "less")
+t_bp
+conc(t_bp, "new drug can decrease the blood pressure of patients")
+```
