@@ -1,0 +1,6 @@
+---
+title: "Paul Kogan-HW4"
+author: "Paul Kogan"
+date: "2021/10/06"
+output: pdf_document
+---
