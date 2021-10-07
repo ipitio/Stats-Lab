@@ -42,3 +42,15 @@ test <- cor.test(x, y, conf.level = 0.99)
 test
 conc(test, "correlation between x and y is zero")
 cat(paste0("\ne)\t $", format(round(1000 * (m * 1.8 + b), 2), nsmall = 2)))
+
+# Q2
+
+data <- read.table("d_logret_6stocks.txt", header = T)
+con <- lm(Intel ~ Citigroup, data)
+san <- lm(Intel ~ 0 + Citigroup, data)
+test <- cor.test(data$Intel, data$Citigroup)
+cat("\na)\t", con$coefficients,
+    "\nb)\t", san$coefficients,
+    "\nc)\t Correlation: ", test$estimate)
+test
+conc(test, "correlation between Intel and Citigroup is zero")
