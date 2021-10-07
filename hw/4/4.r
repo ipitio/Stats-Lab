@@ -1,6 +1,6 @@
 options(warn = -1)
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(tidyverse)
+pacman::p_load(tidyverse, ISwR)
 library(tidyverse)
 this_dir <-  function() {
     this_dir <- commandArgs() %>%
@@ -35,10 +35,10 @@ y <- c(225, 184, 220, 240, 180, 184, 186, 215)
 fit <- summary.lm(lm(y~x))
 m <- fit$coefficients[[2, 1]]
 b <- fit$coefficients[[1, 1]]
+test <- cor.test(x, y, conf.level = 0.99)
 cat("\na)\t", cor(x, y),
     "\nb)\t y(x) =", paste0(m, "x +"), b,
     "\nc)\t", fit$r.squared, "\nd)")
-test <- cor.test(x, y, conf.level = 0.99)
 test
 conc(test, "correlation between x and y is zero")
 cat(paste0("\ne)\t $", format(round(1000 * (m * 1.8 + b), 2), nsmall = 2)))
@@ -47,10 +47,18 @@ cat(paste0("\ne)\t $", format(round(1000 * (m * 1.8 + b), 2), nsmall = 2)))
 
 data <- read.table("d_logret_6stocks.txt", header = T)
 con <- lm(Intel ~ Citigroup, data)
-san <- lm(Intel ~ 0 + Citigroup, data)
-test <- cor.test(data$Intel, data$Citigroup)
-cat("\na)\t", con$coefficients,
-    "\nb)\t", san$coefficients,
+test <- cor.test(data$Citigroup, data$Intel)
+cat("\na)\t Intercept:", con$coefficients[[1]],
+         "; Citigroup:", con$coefficients[[2]],
+    "\nb)\t Citigroup:", lm(Intel ~ 0 + Citigroup, data)$coefficients,
     "\nc)\t Correlation: ", test$estimate)
 test
 conc(test, "correlation between Intel and Citigroup is zero")
+
+# Q3
+
+library(ISwR)
+attach(rmr)
+#plot(body.weight, metabolic.rate, main = "Metabolic Rate vs Body Weight")
+fit <- lm(metabolic.rate ~ body.weight)$coefficients
+cat("The predicted metabolic rate is", fit[[2]] * 80 + fit[[1]])

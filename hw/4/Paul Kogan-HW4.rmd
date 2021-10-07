@@ -1,6 +1,56 @@
 ---
 title: "Paul Kogan-HW4"
 author: "Paul Kogan"
-date: "2021/10/06"
+date: "2021/10/07"
 output: pdf_document
 ---
+```{r}
+pacman::p_load(ISwR)
+rjct <- function(lvl) paste("<= alpha =", lvl,
+    "so reject the null\n\t\t\thypothesis that the")
+conc <- function(test, hyp, lvl = 1 - attr(test$conf.int, "conf.level"),
+                 f = T) {
+    lvl <- ifelse(length(lvl) == 0, 0.05, lvl)
+    val <- test$p.value
+    str <- paste("conclusion: p-value =", val,
+           ifelse(val <= lvl, rjct(lvl), rjct(lvl) %>%
+           str_replace_all(c("<=" = ">", "so" = "so fail to"))), hyp)
+    if (f) cat(str)
+    invisible(str)
+}
+```
+**1**
+```{r, results='hold'}
+x <- c(2.4, 1.6, 2.0, 2.6, 1.4, 1.6, 2.0, 2.2)
+y <- c(225, 184, 220, 240, 180, 184, 186, 215)
+fit <- summary.lm(lm(y~x))
+m <- fit$coefficients[[2, 1]]
+b <- fit$coefficients[[1, 1]]
+test <- cor.test(x, y, conf.level = 0.99)
+cat("\na)\t", cor(x, y),
+    "\nb)\t y(x) =", paste0(m, "x +"), b,
+    "\nc)\t", fit$r.squared, "\nd)")
+test
+conc(test, "correlation between x and y is zero")
+cat(paste0("\ne)\t $", format(round(1000 * (m * 1.8 + b), 2), nsmall = 2)))
+```
+**2**
+```{r, results='hold'}
+data <- read.table("d_logret_6stocks.txt", header = T)
+con <- lm(Intel ~ Citigroup, data)
+test <- cor.test(data$Citigroup, data$Intel)
+cat("\na)\t Intercept:", con$coefficients[[1]],
+         "; Citigroup:", con$coefficients[[2]],
+    "\nb)\t Citigroup:", lm(Intel ~ 0 + Citigroup, data)$coefficients,
+    "\nc)\t Correlation: ", test$estimate)
+test
+conc(test, "correlation between Intel and Citigroup is zero")
+```
+**3**
+```{r, results='hold'}
+library(ISwR)
+attach(rmr)
+fit <- lm(metabolic.rate ~ body.weight)$coefficients
+cat("The predicted rate is", fit[[2]] * 80 + fit[[1]], "for 80kg weight")
+plot(body.weight, metabolic.rate, main = "Body Weight vs Metabolic Rate")
+```
