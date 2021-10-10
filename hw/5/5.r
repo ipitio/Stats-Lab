@@ -32,19 +32,46 @@ conc <- \(test, hyp, lvl, cat = T) {
 # Q1
 
 data <- read.table("d_logret_6stocks.txt", header = T)
-limo <- lm(Pfizer ~ Exxon, data)
-vana <- anova(limo)
-sset <- data[, c("Pfizer", "Exxon", "Citigroup")] %>% gather(tic, ret, 1:2)
-grup <- anova(lm(ret ~ tic, sset))
+sset <- gather(data[, c("Pfizer", "Exxon", "Citigroup")], tic, ret, 1:2)
 citi <- data$Citigroup
-test <- binom.test(length(citi[which(citi > 0)]), length(citi))
+limo <- lm(Pfizer ~ Exxon, data)
+vaan <- anova(limo)
+grup <- anova(lm(ret ~ tic, sset))
+test <- binom.test(length(citi[citi > 0]), length(citi))
 cat("\na)\t Intercept:\t", limo$coefficients[[1]],
     "\n  \t Exxon:\t\t", limo$coefficients[[2]], "\nb)\n\t")
-vana
-conc(vana, "regression effects are not significant")
+vaan
+conc(vaan, "regression effects are not significant")
 cat("\nc)\n\t")
 grup
 conc(grup, "means of the groups are equal")
 cat("\nd)\t")
 test
 conc(test, "proportion of positive returns is 0.5")
+
+# Q2
+
+library(ISwR)
+data <- na.omit(data.frame(igf1 = juul$igf1, tanner = juul$tanner))
+vaan <- anova(lm(igf1 ~ tanner, data))
+test <- pairwise.t.test(data$igf1, data$tanner, p.adj = "bonf")
+pval <- test$p.value
+cat("\na)\n\t")
+vaan
+conc(vaan, "igf1 means of each tanner level are equal")
+cat("\nb)\n")
+print.data.frame(plyr::ddply(data, ~tanner, summarise, mean = mean(igf1)))
+cat("\nc)")
+test
+cat("Tanner level pairs that appear to have a difference:\n\t")
+for (i in 1:nrow(pval)) {
+  for (j in 1:ncol(pval)) {
+    e <- pval[i, j]
+    if (!is.na(e) && .5 > e) {
+      pair <- paste(rownames(pval)[i], "and", colnames(pval)[j])
+      pair <- ifelse(!(i == nrow(pval) && j == ncol(pval)),
+        paste0(pair, ", "), paste("and", pair))
+      cat(pair)
+    }
+  }
+}
