@@ -1,4 +1,3 @@
-options(warn = -1)
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse, ISwR, MASS)
 library(tidyverse)
@@ -35,34 +34,29 @@ data <- read.table("d_logret_6stocks.txt", header = T)
 sset <- gather(data[, c("Pfizer", "Exxon", "Citigroup")], tic, ret, 1:2)
 citi <- data$Citigroup
 limo <- lm(Pfizer ~ Exxon, data)
-vaan <- anova(limo)
-grup <- anova(lm(ret ~ tic, sset))
-test <- binom.test(length(citi[citi > 0]), length(citi))
 cat("\na)\t Intercept:\t", limo$coefficients[[1]],
     "\n  \t Exxon:\t\t", limo$coefficients[[2]], "\nb)\n\t")
-vaan
+(vaan <- anova(limo))
 conc(vaan, "regression effects are not significant")
 cat("\nc)\n\t")
-grup
+(grup <- anova(lm(ret ~ tic, sset)))
 conc(grup, "means of the groups are equal")
 cat("\nd)\t")
-test
+(test <- binom.test(length(citi[citi > 0]), length(citi)))
 conc(test, "proportion of positive returns is 0.5")
 
 # Q2
 
 library(ISwR)
-data <- na.omit(data.frame(igf1 = juul$igf1, tanner = juul$tanner))
-vaan <- anova(lm(igf1 ~ tanner, data))
-test <- pairwise.t.test(data$igf1, data$tanner, p.adj = "bonf")
-pval <- test$p.value
+data <- na.omit(data.frame(igf1 = juul$igf1, tanner = juul$tanner)) 
 cat("\na)\n\t")
-vaan
+(vaan <- anova(lm(igf1 ~ tanner, data)))
 conc(vaan, "igf1 means of each tanner level are equal")
 cat("\nb)\n")
 print.data.frame(plyr::ddply(data, ~tanner, summarise, mean = mean(igf1)))
 cat("\nc)")
-test
+(test <- pairwise.t.test(data$igf1, data$tanner, p.adj = "bonf"))
+pval <- test$p.value
 cat("Tanner level pairs that appear to have a difference:\n\t")
 for (i in 1:nrow(pval)) {
   for (j in 1:ncol(pval)) {
@@ -75,3 +69,9 @@ for (i in 1:nrow(pval)) {
     }
   }
 }
+
+# Q3
+
+library(MASS)
+(test <- fisher.test(survey$Smoke, survey$Exer))
+conc(test, "students smoking habit is independent of their exercise level")
