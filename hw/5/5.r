@@ -48,14 +48,15 @@ conc(test, "proportion of positive returns is 0.5")
 # Q2
 
 library(ISwR)
-data <- na.omit(data.frame(igf1 = juul$igf1, tanner = juul$tanner)) 
+data <- na.exclude(data.frame(igf1 = juul$igf1, tanner = factor(juul$tanner,
+        labels = c("I", "II", "III", "IV", "V"))))
 cat("\na)\n\t")
 (vaan <- anova(lm(igf1 ~ tanner, data)))
 conc(vaan, "igf1 means of each tanner level are equal")
 cat("\nb)\n")
 print.data.frame(plyr::ddply(data, ~tanner, summarise, mean = mean(igf1)))
 cat("\nc)")
-(test <- pairwise.t.test(data$igf1, data$tanner, p.adj = "bonf"))
+(test <- pairwise.t.test(data$igf1, data$tanner, p.adj = "bonf", pool.sd = F))
 pval <- test$p.value
 cat("Tanner level pairs that appear to have a difference:\n\t")
 for (i in 1:nrow(pval)) {
@@ -63,9 +64,8 @@ for (i in 1:nrow(pval)) {
     e <- pval[i, j]
     if (!is.na(e) && .5 > e) {
       pair <- paste(rownames(pval)[i], "and", colnames(pval)[j])
-      pair <- ifelse(!(i == nrow(pval) && j == ncol(pval)),
-        paste0(pair, ", "), paste("and", pair))
-      cat(pair)
+      cat(ifelse(!(i == nrow(pval) && j == ncol(pval)),
+        paste0(pair, ", "), paste("and", pair)))
     }
   }
 }
