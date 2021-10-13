@@ -6,7 +6,7 @@ output: pdf_document
 ---
 ```{r}
 pacman::p_load(ISwR, MASS)
-rjct <- function(lvl) paste("<= alpha =", lvl,
+rjct <- \(lvl) paste("<= alpha =", lvl,
     "so reject the null\n\t\t\thypothesis that the")
 conc <- \(test, hyp, lvl, cat = T) {
     lvl <- try(1 - attr(test$conf.int, "conf.level"))
