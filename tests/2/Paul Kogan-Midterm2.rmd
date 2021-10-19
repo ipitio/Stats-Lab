@@ -1,0 +1,25 @@
+---
+title: "Paul Kogan-Midterm2"
+author: "Paul Kogan"
+date: "2021/10/19"
+output: pdf_document
+---
+```{r}
+pacman::p_load(ISwR, MASS)
+rjct <- \(lvl) paste("<= alpha =", lvl,
+    "so reject the null\n\t\t\thypothesis that the")
+conc <- \(test, hyp, lvl, cat = T) {
+    lvl <- try(1 - attr(test$conf.int, "conf.level"))
+    val <- try(test$p.value)
+    lvl <- ifelse(length(lvl) == 0, .05, lvl)
+    val <- ifelse(length(val) == 0, test[, 5], val)
+    str <- paste("conclusion: p-value =", format(round(val, 4), nsmall = 4),
+           ifelse(val <= lvl, rjct(lvl), rjct(lvl) %>%
+           str_replace_all(c("<=" = ">", "so" = "so fail to"))), hyp)
+    if (cat) cat(str)
+    invisible(str)
+}
+```
+**1**
+```{r, results='hold'}
+```

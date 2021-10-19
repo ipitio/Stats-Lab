@@ -1,0 +1,44 @@
+---
+title: "AMS394_note6"
+author: "Weihao Wang"
+date: "5/6/2021"
+output: html_document
+---
+
+**Tabular data**
+
+1. Single proportions
+
+size N, p
+binom(N, p), mean = Np, variance = Np(1-p)
+
+Example 1.
+39 of 215 patients are observed to have asthma
+To test the H0: the probability of a random patient having asthma is 0.15
+
+```{r}
+# H0: p = p0
+# H0: p = 0.15
+prop.test(39, 215, 0.15) # prop.test(# of successes, # of trials, p0)
+binom.test(39, 215, 0.15)
+```
+
+2. r * c tables
+
+```{r}
+# H0: the distribution over columns is the same for each row, or vice versa if the column totals were fixed
+# the rows and columns are independent
+caff.marital <-matrix(c(652,1537,598,242,36,46,38,21,218,327, 106,67), nrow=3,byrow=T)
+colnames(caff.marital) <- c("0","1-150","151-300",">300") 
+rownames(caff.marital) <- c("Married","Prev.married","Single")
+caff.marital
+
+chisq.test(caff.marital)
+chisq.test(caff.marital)$expected
+chisq.test(caff.marital)$observed
+
+library(ISwR)
+data(juul) 
+attach(juul) 
+chisq.test(tanner,sex) # df = (5-1)*(2-1) = 4
+```
